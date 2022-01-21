@@ -1,0 +1,31 @@
+1) class Lorry extends Car, Moveable, Stopable {
+    // ...
+   }
+
+   Заменить на
+   class Lorry extends Car implements Moveable, Stopable {
+    // ...
+   }
+
+2) abstract class Car {
+       public Engine engine;// Почему public?
+     // ...
+   }
+   Заменить на private
+
+3) abstract class Car {
+        // ...
+      abstract void open(); //package-private? Зачем? Надо заменить на public.
+     // ...
+    }
+
+4) class LightWeightCar extends Car implements Moveable {
+       @Override
+       void open() { // аналогично пункту 3 package-private?
+           System.out.println("Car is open");
+       }
+        // ...
+    }
+
+ 5) Филосовский вопрос, какой класс должен реализовывать интерфейсы movable и stopable?
+    По мне логичнее, чтобы Car наследовал эти интерфейсы.
