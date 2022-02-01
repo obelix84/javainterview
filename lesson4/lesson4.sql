@@ -127,8 +127,29 @@ with films_stat as (
 select sum(s.price) as session_revenue, f.id, f.name, d.duration, count(t.id) as tickets_count from session s, films f, duration d, tickets t
 where s.film_id = f.id and f.duration_id = d.id and t.session_id = s.id
 group by s.id
-)
+order by session_revenue desc
+) 
 
 select fs.name, sum(fs.session_revenue) as revenue, sum(fs.tickets_count) as tickets ,avg(fs.tickets_count) as session_avg from films_stat fs
 group by fs.id
-order by revenue desc
+union
+select "total" as name, sum(fs.session_revenue)  as revenue, sum(fs.tickets_count) as tickets, avg(fs.tickets_count) as session_avg
+from films_stat fs
+
+--4
+
+select sum(s.price) as time_revenue, count(t.id) as tickets_count from session s, films f, duration d, tickets t
+where s.film_id = f.id and t.session_id = s.id
+and extract(HOUR_MINUTE FROM s.start) between 900 and 1500 
+union 
+select sum(s.price) as time_revenue, count(t.id) as tickets_count from session s, films f, duration d, tickets t
+where s.film_id = f.id and t.session_id = s.id
+and extract(HOUR_MINUTE FROM s.start) between 1501 and 1800 
+union 
+select sum(s.price) as time_revenue, count(t.id) as tickets_count from session s, films f, duration d, tickets t
+where s.film_id = f.id and t.session_id = s.id
+and extract(HOUR_MINUTE FROM s.start) between 1801 and 2399 
+union 
+select sum(s.price) as time_revenue, count(t.id) as tickets_count from session s, films f, duration d, tickets t
+where s.film_id = f.id and t.session_id = s.id
+and extract(HOUR_MINUTE FROM s.start) between 2101 and 2100 
