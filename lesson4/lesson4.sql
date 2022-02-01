@@ -120,3 +120,15 @@ from intervals i1, intervals i2
 where i1.start < i2.start 
 group by i1.session_id
 having min(diff) and diff > 30
+
+--3 
+
+with films_stat as (
+select sum(s.price) as session_revenue, f.id, f.name, d.duration, count(t.id) as tickets_count from session s, films f, duration d, tickets t
+where s.film_id = f.id and f.duration_id = d.id and t.session_id = s.id
+group by s.id
+)
+
+select fs.name, sum(fs.session_revenue) as revenue, sum(fs.tickets_count) as tickets ,avg(fs.tickets_count) as session_avg from films_stat fs
+group by fs.id
+order by revenue desc
