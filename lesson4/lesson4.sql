@@ -27,7 +27,6 @@ ADD CONSTRAINT `FK_duration`
 -- вот тут есть нюансы, стоимость билета зависит от сеанса
 -- и куда тут пихать стоимость в сеанс или в билет...
 -- т.е. стоимость билета на конкретный сеанс зависит от времени и от фильма
--- оставим стоимость билета
 -- еще надо бы добавить билет на какое место, но опустим...
 -- наверное правильнее стоимость запихнуть в сеанс, а в билет добавить его 
 -- атрибуты: место в зале
@@ -96,6 +95,28 @@ from session s
 inner join films f on s.film_id = f.id 
 inner join duration d on f.duration_id = d.id )
 
-select * from intervals i1, intervals i2 where i1.start < i2.end AND i1.end > i2.start 
+select i1.name, i1.start, i1.duration, 
+i2.name, i2.start, i2.duration from intervals i1, intervals i2 where i1.start < i2.end AND i1.end > i2.start 
 and i1.session_id <> i2.session_id
 and i1.session_id < i2.session_id
+
+--2
+
+with intervals as (
+select s.film_id, 
+s.id as session_id, 
+f.name, 
+s.start,
+DATE_ADD(s.start, interval d.duration MINUTE) as end,
+d.duration as duration
+from session s 
+inner join films f on s.film_id = f.id 
+inner join duration d on f.duration_id = d.id )
+
+select i1.name, i1.start, i1.end, 
+i2.name, i2.start, i2.duration, 
+timestampdiff(MINUTE, i1.end, i2.start) as diff
+from intervals i1, intervals i2 
+where i1.start < i2.start 
+group by i1.session_id
+having min(diff) and diff > 30
