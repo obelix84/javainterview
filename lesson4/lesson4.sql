@@ -31,54 +31,6 @@ ADD CONSTRAINT `FK_duration`
 -- еще надо бы добавить билет на какое место, но опустим...
 -- наверное правильнее стоимость запихнуть в сеанс, а в билет добавить его 
 -- атрибуты: место в зале
-CREATE TABLE `cinema`.`session` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `start_time` DATETIME NOT NULL,
-  `film_id` INT NOT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `FK_film_idx` (`film_id` ASC) VISIBLE,
-  CONSTRAINT `FK_film`
-    FOREIGN KEY (`film_id`)
-    REFERENCES `cinema`.`film` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
-
-
-CREATE TABLE `cinema`.`ticket` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `price` DECIMAL(10,2) NULL,
-  `price`
-  PRIMARY KEY (`id`));
-
--- таблица связывающая сеансы и билеты
--- 
-CREATE TABLE `cinema`.`sessions_tickets` (
-  `session_id` INT NOT NULL,
-  `ticket_id` INT NOT NULL,
-  PRIMARY KEY (`session_id`, `ticket_id`),
-  INDEX `FK_ticket_idx` (`ticket_id` ASC) VISIBLE,
-  CONSTRAINT `FK_ticket`
-    FOREIGN KEY (`ticket_id`)
-    REFERENCES `cinema`.`ticket` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `FK_session`
-    FOREIGN KEY (`session_id`)
-    REFERENCES `cinema`.`session` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
-
-INSERT INTO `cinema`.`duration` (`id`, `duration`) VALUES ('1', '60');
-INSERT INTO `cinema`.`duration` (`id`, `duration`) VALUES ('2', '90');
-INSERT INTO `cinema`.`duration` (`id`, `duration`) VALUES ('3', '120');
-
-INSERT INTO `cinema`.`film` (`id`, `name`, `duration_id`) VALUES ('1', 'film1', '1');
-INSERT INTO `cinema`.`film` (`id`, `name`, `duration_id`) VALUES ('2', 'film2', '2');
-INSERT INTO `cinema`.`film` (`id`, `name`, `duration_id`) VALUES ('3', 'film3', '3');
-INSERT INTO `cinema`.`film` (`id`, `name`, `duration_id`) VALUES ('4', 'film4', '2');
-INSERT INTO `cinema`.`film` (`id`, `name`, `duration_id`) VALUES ('5', 'film5', '3');
 
 
 CREATE TABLE `cinema`.`session` (
@@ -98,7 +50,7 @@ ADD CONSTRAINT `FK_film`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
-  CREATE TABLE `cinema`.`tikets` (
+  CREATE TABLE `cinema`.`tickets` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `session_id` INT NOT NULL,
   PRIMARY KEY (`id`),
@@ -109,9 +61,41 @@ ADD CONSTRAINT `FK_film`
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
+INSERT INTO `cinema`.`duration` (`id`, `duration`) VALUES ('1', '60');
+INSERT INTO `cinema`.`duration` (`id`, `duration`) VALUES ('2', '90');
+INSERT INTO `cinema`.`duration` (`id`, `duration`) VALUES ('3', '120');
+
+INSERT INTO `cinema`.`film` (`id`, `name`, `duration_id`) VALUES ('1', 'film1', '1');
+INSERT INTO `cinema`.`film` (`id`, `name`, `duration_id`) VALUES ('2', 'film2', '2');
+INSERT INTO `cinema`.`film` (`id`, `name`, `duration_id`) VALUES ('3', 'film3', '3');
+INSERT INTO `cinema`.`film` (`id`, `name`, `duration_id`) VALUES ('4', 'film4', '2');
+INSERT INTO `cinema`.`film` (`id`, `name`, `duration_id`) VALUES ('5', 'film5', '3');
+
 INSERT INTO `cinema`.`session` (`id`, `start`, `price`, `film_id`) VALUES ('1', '2022-01-01 15:00:00', '100', '1');
 INSERT INTO `cinema`.`session` (`id`, `start`, `price`, `film_id`) VALUES ('3', '2022-01-01 16:00:00', '100', '3');
 INSERT INTO `cinema`.`session` (`id`, `start`, `price`, `film_id`) VALUES ('4', '2022-01-02 11:00:00', '100', '4');
 INSERT INTO `cinema`.`session` (`id`, `start`, `price`, `film_id`) VALUES ('5', '2022-01-02 12:00:00', '300', '5');
 
+INSERT INTO `cinema`.`tickets` (`id`, `session_id`) VALUES ('1', '1');
+INSERT INTO `cinema`.`tickets` (`id`, `session_id`) VALUES ('2', '1');
+INSERT INTO `cinema`.`tickets` (`id`, `session_id`) VALUES ('3', '1');
+INSERT INTO `cinema`.`tickets` (`id`, `session_id`) VALUES ('4', '2');
+INSERT INTO `cinema`.`tickets` (`id`, `session_id`) VALUES ('5', '3');
+INSERT INTO `cinema`.`tickets` (`id`, `session_id`) VALUES ('6', '4');
+INSERT INTO `cinema`.`tickets` (`id`, `session_id`) VALUES ('7', '5');
 
+-- 1
+
+with intervals as (
+select s.film_id, 
+s.id as session_id, 
+f.name, 
+s.start,
+DATE_ADD(s.start, interval d.duration MINUTE) as end
+from session s 
+inner join films f on s.film_id = f.id 
+inner join duration d on f.duration_id = d.id )
+
+select * from intervals i1, intervals i2 where i1.start < i2.end AND i1.end > i2.start 
+and i1.session_id <> i2.session_id
+and i1.session_id < i2.session_id
