@@ -23,5 +23,8 @@ public class Lesson5App {
         studentService.deleteById(1L);
         List<Student> list = studentService.findAll();
         System.out.println(list);
+        Student s = list.get(1);
+        s.setName("Changed");
+        studentService.update(s);
     }
 }
