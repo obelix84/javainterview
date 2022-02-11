@@ -42,7 +42,7 @@
                     <url>http://localhost:8080/manager/text</url>
                     <username>test</username>
                     <password>test</password>
-                    <path>/first-servlet</path>
+                    <path>/hello</path>
                     <update>true</update>
                 </configuration>
             </plugin>
