@@ -1,0 +1,31 @@
+<div class="row py-2">
+  <div class="col-12">
+    <a class="btn btn-primary" routerLink="/user/new">Add User</a>
+  </div>
+
+  <div class="col-12">
+    <table class="table table-bordered my-2">
+      <thead>
+      <tr>
+        <th scope="col">Id</th>
+        <th scope="col">Firstname</th>
+        <th scope="col">Lastname</th>
+        <th scope="col">Login</th>
+        <th scope="col">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let user of users">
+        <th scope="row">{{user.id}}</th>
+        <td>{{user.firstname}}</td>
+        <td>{{user.lastname}}</td>
+        <td>{{user.login}}</td>
+        <td>
+          <a class="btn btn-success" routerLink="/user/{{user.id}}"><i class="fas fa-edit"></i></a>
+          <a class="btn btn-danger" href="#"><i class="far fa-trash-alt"></i></a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
